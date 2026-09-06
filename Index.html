@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Darasa — School Staff Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --ink:#182420;
+  --ink-soft:#52655A;
+  --ink-faint:#8A9992;
+  --paper:#F5F8F4;
+  --card:#FFFFFF;
+  --line:#DCE6DD;
+  --line-soft:#EBF1E8;
+
+  --head:#0F3323;
+  --head-bg:#E7EEE9;
+  --deputy:#1E5A3D;
+  --deputy-bg:#E9F1EC;
+  --ict:#264F73;
+  --ict-bg:#E8EEF4;
+  --senior:#3D7D5A;
+  --senior-bg:#EAF3EC;
+  --hod:#A8671C;
+  --hod-bg:#F7EEE0;
+  --classteacher:#C08A2E;
+  --classteacher-bg:#FAF3E4;
+  --subject:#5C6B70;
+  --subject-bg:#EEF1F1;
+
+  --accent:#DDA23C;
+  --accent-deep:#B87A1E;
+  --rust:#B0432E;
+  --rust-bg:#FBEAE6;
+  --success:#2E7D4F;
+  --success-bg:#E7F3EB;
+
+  --radius-sm:8px;
+  --radius-md:14px;
+  --radius-lg:22px;
+  --shadow-card:0 1px 2px rgba(15,51,35,.06), 0 6px 20px rgba(15,51,35,.05);
+  --font:'Lexend', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font);
+  background:var(--paper);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+}
+#app{min-height:100vh;}
+button, input, select, textarea{font-family:var(--font);}
+a{color:inherit;}
+h1,h2,h3,h4{margin:0;font-weight:700;letter-spacing:-0.01em;}
+p{margin:0;}
+::selection{background:var(--accent);color:var(--head);}
+:focus-visible{outline:2.5px solid var(--ict);outline-offset:2px;border-radius:4px;}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important;}}
+
+/* ============ UTILITY ============ */
+.hidden{display:none!important;}
+.row{display:flex;align-items:center;}
+.col{display:flex;flex-direction:column;}
+.gap-xs{gap:6px;} .gap-sm{gap:10px;} .gap-md{gap:16px;} .gap-lg{gap:24px;}
+.grow{flex:1;}
+.muted{color:var(--ink-soft);}
+.faint{color:var(--ink-faint);}
+.small{font-size:13px;}
+.tiny{font-size:11.5px;}
+
+/* ============ BUTTONS ============ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:none;border-radius:11px;padding:11px 18px;font-size:14.5px;font-weight:600;
+  cursor:pointer;transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+  white-space:nowrap;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--deputy);color:#fff;}
+.btn-primary:hover{background:var(--head);}
+.btn-accent{background:var(--accent);color:#2A1D06;}
+.btn-accent:hover{background:var(--accent-deep);color:#fff;}
+.btn-ghost{background:transparent;color:var(--ink-soft);border:1.5px solid var(--line);}
+.btn-ghost:hover{border-color:var(--deputy);color:var(--deputy);}
+.btn-danger{background:var(--rust-bg);color:var(--rust);}
+.btn-danger:hover{background:var(--rust);color:#fff;}
+.btn-sm{padding:7px 12px;font-size:13px;border-radius:8px;}
+.btn-block{width:100%;}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.btn:disabled:hover{background:inherit;}
+.icon-btn{background:transparent;border:none;cursor:pointer;padding:6px;border-radius:8px;color:var(--ink-soft);display:inline-flex;}
+.icon-btn:hover{background:var(--line-soft);color:var(--ink);}
+
+/* ============ FORMS ============ */
+label{font-size:13px;font-weight:600;color:var(--ink-soft);display:block;margin-bottom:6px;}
+input[type=text],input[type=number],input[type=password],input[type=search],select,textarea{
+  width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;
+  font-size:14.5px;color:var(--ink);background:#fff;transition:border-color .12s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--deputy);}
+.field{margin-bottom:16px;}
+.field-row{display:flex;gap:12px;flex-wrap:wrap;}
+.field-row .field{flex:1;min-width:150px;}
+.pin-input{letter-spacing:8px;font-size:22px;text-align:center;font-weight:700;}
+.helptext{font-size:12.5px;color:var(--ink-faint);margin-top:5px;}
+.checkbox-row{display:flex;align-items:center;gap:8px;padding:9px 0;}
+.checkbox-row input{width:auto;}
+
+/* ============ CARDS & LAYOUT ============ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-md);padding:22px;}
+.card-flush{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-md);}
+.stat-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-md);padding:18px 20px;}
+.stat-num{font-size:30px;font-weight:800;color:var(--head);line-height:1.1;}
+.stat-label{font-size:13px;color:var(--ink-soft);margin-top:4px;}
+.accent-panel{border-left:4px solid var(--accent);background:#fff;border-radius:0 var(--radius-md) var(--radius-md) 0;padding:20px 22px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap;}
+.badge-head{background:var(--head-bg);color:var(--head);}
+.badge-deputy{background:var(--deputy-bg);color:var(--deputy);}
+.badge-ict{background:var(--ict-bg);color:var(--ict);}
+.badge-senior{background:var(--senior-bg);color:var(--senior);}
+.badge-hod{background:var(--hod-bg);color:var(--hod);}
+.badge-classteacher{background:var(--classteacher-bg);color:var(--classteacher);}
+.badge-subject{background:var(--subject-bg);color:var(--subject);}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none;}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:12px;color:var(--ink-faint);font-weight:600;padding:0 12px 10px;border-bottom:1.5px solid var(--line);}
+td{padding:12px;border-bottom:1px solid var(--line-soft);font-size:14px;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius-md);background:#fff;}
+.table-wrap table{min-width:520px;}
+.score-input{width:64px;padding:8px 6px;text-align:center;border:1.5px solid var(--line);border-radius:8px;font-weight:600;}
+
+/* Empty state */
+.empty{padding:40px 20px;text-align:center;color:var(--ink-soft);}
+.empty h4{color:var(--ink);margin-bottom:6px;}
+
+/* ============ APP SHELL ============ */
+.shell{display:flex;min-height:100vh;}
+.sidebar{
+  width:230px;flex:none;background:var(--head);color:#fff;padding:20px 14px;
+  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.brand{padding:8px 10px 20px;}
+.brand-school{font-size:16px;font-weight:700;line-height:1.25;}
+.brand-tag{font-size:11.5px;color:#9FBBA9;margin-top:3px;}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;
+  color:#CFE0D5;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;
+}
+.nav-item svg{flex:none;opacity:.85;}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,.14);color:#fff;font-weight:600;}
+.nav-spacer{flex:1;}
+.sidebar-user{border-top:1px solid rgba(255,255,255,.14);padding-top:14px;margin-top:10px;}
+.sidebar-user-name{font-size:13.5px;font-weight:600;color:#fff;}
+.main{flex:1;min-width:0;}
+.topbar{
+  display:none;align-items:center;justify-content:space-between;padding:14px 18px;
+  background:var(--head);color:#fff;position:sticky;top:0;z-index:20;
+}
+.main-inner{padding:28px 32px;max-width:1180px;}
+.page-head{margin-bottom:24px;}
+.page-head h1{font-size:23px;}
+.page-head .sub{color:var(--ink-soft);font-size:14.5px;margin-top:4px;}
+.mobile-drawer{position:fixed;inset:0;z-index:50;display:none;}
+.mobile-drawer.open{display:block;}
+.drawer-backdrop{position:absolute;inset:0;background:rgba(15,30,20,.5);}
+.drawer-panel{position:absolute;left:0;top:0;bottom:0;width:250px;background:var(--head);padding:20px 14px;overflow-y:auto;}
+
+@media (max-width: 860px){
+  .sidebar{display:none;}
+  .topbar{display:flex;}
+  .main-inner{padding:20px 16px 90px;}
+}
+
+/* ============ AUTH SCREENS ============ */
+.auth-wrap{min-height:100vh;display:flex;}
+.auth-hero{
+  flex:1;background:var(--head);color:#fff;padding:56px 48px;display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow:hidden;min-height:280px;
+}
+.auth-hero::before{
+  content:'';position:absolute;inset:0;opacity:.08;
+  background:repeating-linear-gradient(180deg, #fff 0px, #fff 1px, transparent 1px, transparent 34px);
+  pointer-events:none;
+}
+.auth-hero-top{position:relative;}
+.auth-hero-brand{font-size:14px;font-weight:700;color:#BFE0CC;letter-spacing:.02em;}
+.auth-hero-title{font-size:38px;font-weight:800;margin-top:22px;line-height:1.15;max-width:420px;}
+.auth-hero-desc{font-size:15px;color:#BFDCC7;margin-top:14px;max-width:380px;line-height:1.6;}
+.auth-hero-foot{position:relative;font-size:12.5px;color:#8FB69E;}
+.auth-form-side{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 32px;background:var(--paper);}
+.auth-form-box{width:100%;max-width:380px;}
+@media (max-width: 780px){
+  .auth-wrap{flex-direction:column;}
+  .auth-hero{padding:32px 24px;min-height:180px;}
+  .auth-hero-title{font-size:27px;}
+}
+
+.staff-pick-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;margin-top:14px;}
+.staff-pick{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;
+  border:1.5px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;text-align:left;width:100%;
+}
+.staff-pick:hover{border-color:var(--deputy);}
+.staff-pick-name{font-weight:600;font-size:14.5px;}
+
+/* Duty list */
+.duty-list{margin:0;padding:0;list-style:none;}
+.duty-list li{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:14px;color:var(--ink);}
+.duty-list li:last-child{border-bottom:none;}
+.duty-list li svg{flex:none;margin-top:3px;color:var(--senior);}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--head);color:#fff;
+  padding:12px 20px;border-radius:11px;font-size:14px;font-weight:500;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.2);
+  opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,30,20,.45);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal-box{background:#fff;border-radius:var(--radius-md);padding:26px;max-width:460px;width:100%;max-height:88vh;overflow-y:auto;}
+.modal-box h3{margin-bottom:4px;}
+
+/* Bottom tab bar (mobile) */
+.tabbar{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);z-index:30;
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom));}
+@media (max-width:860px){.tabbar{display:flex;}}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;color:var(--ink-faint);background:none;border:none;font-size:10.5px;font-weight:600;}
+.tab-item.active{color:var(--deputy);}
+
+/* Print */
+@media print{
+  .sidebar,.topbar,.tabbar,.no-print{display:none!important;}
+  .main-inner{padding:0;max-width:none;}
+  body{background:#fff;}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+
+<script>
+/* =========================================================================
+   CONSTANTS
+   ========================================================================= */
+const ROLE_META = {
+  headteacher:   {label:'Headteacher',          short:'Head',      badge:'head'},
+  deputy:        {label:'Deputy Headteacher',   short:'Deputy',    badge:'deputy'},
+  ict:           {label:'ICT Teacher',          short:'ICT',       badge:'ict'},
+  senior:        {label:'Senior Teacher',       short:'Senior Tr.',badge:'senior'},
+  hod:           {label:'Head of Department',   short:'HOD',       badge:'hod'},
+  classteacher:  {label:'Class Teacher',        short:'Class Tr.', badge:'classteacher'},
+  subject:       {label:'Subject Teacher',      short:'Subject Tr.',badge:'subject'},
+};
+const ROLE_ORDER = ['headteacher','deputy','ict','senior','hod','classteacher','subject'];
+
+const LEVEL_META = {
+  primary:{label:'Primary', sub:'Grade 1–6'},
+  junior:{label:'Junior School', sub:'Grade 7–9'},
+  senior:{label:'Senior School', sub:'Grade 10–12'},
+};
+const PATHWAYS = ['STEM','Social Sciences','Arts and Sports Science'];
+
+const ROLE_DUTIES = {
+  headteacher:[
+    "Overall accounting officer: manage the school's human and physical resources so learning can happen",
+    "Supervise and evaluate how the curriculum is implemented across every level in the school",
+    "Assign teaching and other official duties to staff, and carry a reasonable teaching load yourself",
+    "Report the institution's performance to TSC, the Ministry of Education and the Board of Management",
+    "Chair staff and Board of Management meetings; act as the school's link to parents and the community",
+    "Uphold staff and learner discipline and ensure a safe, conducive environment for everyone",
+  ],
+  deputy:[
+    "Deputise for the Headteacher and take charge of the institution in their absence",
+    "Lead day-to-day curriculum implementation: timetabling, teaching loads, and academic monitoring",
+    "Handle discipline cases for learners and staff alongside the Headteacher",
+    "Coordinate guidance and counselling services for learners, teachers and support staff",
+    "Organise remedial support for learners with performance gaps",
+    "Supervise non-teaching staff and the general upkeep of the school",
+  ],
+  ict:[
+    "Keep the school's digital records and systems (including this portal) running and secure",
+    "Coordinate data entry and updates to national systems such as NEMIS",
+    "Support fellow teachers in using digital tools for teaching, marks entry and reporting",
+    "Teach ICT/Computer Studies and set up the school's ICT lab and equipment",
+    "Manage staff accounts, classes and subjects in this portal on behalf of the administration",
+    "Escalate anything requiring the Headteacher or Deputy's decision — this role supports administration, it doesn't replace it",
+  ],
+  senior:[
+    "Hold an administrative docket assigned by the Headteacher (e.g. examinations, curriculum, guidance & counselling)",
+    "Supervise curriculum delivery within your docket and mentor less experienced teachers",
+    "Prepare lesson plans, schemes of work and teach your subjects of specialisation",
+    "Evaluate learners and prepare them for national and internal examinations",
+    "Organise workshops and seminars so staff can share ideas and grow professionally",
+    "Represent school administration on relevant committees",
+  ],
+  hod:[
+    "Coordinate schemes of work, lesson plans and syllabus coverage across your department",
+    "Oversee setting, moderation and marking of departmental assessments",
+    "Compile and analyse your department's academic performance across all classes",
+    "Mentor and support the subject teachers within your department",
+    "Manage departmental teaching resources and equipment",
+    "Teach your own subject(s) of specialisation to a class",
+  ],
+  classteacher:[
+    "Take overall charge of your class: register, attendance and general welfare",
+    "Compile and review your class's academic performance across every subject each term",
+    "Serve as the first point of contact for parents about their child's progress or conduct",
+    "Maintain learner discipline and refer serious matters to the Deputy or Headteacher",
+    "Coordinate your class's co-curricular activities",
+    "Teach your own subject(s) to this and other classes",
+  ],
+  subject:[
+    "Prepare schemes of work, lesson plans and records of work covered for your subject",
+    "Teach your subject(s) to impart the knowledge, skills and competencies in the curriculum",
+    "Set, administer and mark continuous assessments and examinations",
+    "Enter and submit marks promptly for every assessment you administer",
+    "Give remedial support to learners who need extra help",
+    "Undertake the TSC Performance Appraisal and Development (TPAD) process",
+  ],
+};
+
+const CBC_BANDS = [
+  {level:'EE1', label:'Exceeding Expectation', min:90, points:8},
+  {level:'EE2', label:'Exceeding Expectation', min:75, points:7},
+  {level:'ME1', label:'Meeting Expectation',   min:58, points:6},
+  {level:'ME2', label:'Meeting Expectation',   min:41, points:5},
+  {level:'AE1', label:'Approaching Expectation',min:31, points:4},
+  {level:'AE2', label:'Approaching Expectation',min:21, points:3},
+  {level:'BE1', label:'Below Expectation',     min:11, points:2},
+  {level:'BE2', label:'Below Expectation',     min:0,  points:1},
+];
+const LETTER_BANDS = [
+  {level:'A',min:80},{level:'A-',min:75},{level:'B+',min:70},{level:'B',min:65},
+  {level:'B-',min:60},{level:'C+',min:55},{level:'C',min:50},{level:'C-',min:45},
+  {level:'D+',min:40},{level:'D',min:35},{level:'D-',min:30},{level:'E',min:0},
+];
+
+const DEFAULT_SUBJECTS = {
+  primary:['English','Kiswahili','Mathematics','Science and Technology','Social Studies','Religious Education','Creative Arts','Physical and Health Education','Agriculture'],
+  junior:['English','Kiswahili','Kenya Sign Language','Mathematics','Science and Technology','Social Studies','Creative Arts','Agriculture and Nutrition','Religious Education'],
+};
+
+const SENIOR_CORE = ['English','Kiswahili','Mathematics','Community Service Learning','Physical Education'];
+const SENIOR_ELECTIVES = {
+  'STEM':['Physics','Chemistry','Biology','Computer Science','Agriculture'],
+  'Social Sciences':['History and Citizenship','Geography','Business Studies','Religious Education','Literature'],
+  'Arts and Sports Science':['Music','Visual Arts','Performing Arts','Sports Science'],
+};
+
+/* =========================================================================
+   STATE
+   ========================================================================= */
+let DB = {school:null, staff:[], departments:[], classes:[], subjects:[], students:[], marks:[]};
+let SESSION = {user:null};
+let VIEW = {name:'loading', params:{}};
+let LOGIN_STEP = {stage:'pick', staffId:null, search:''};
+let MOBILE_NAV_OPEN = false;
+let DRAFT = {};
+
+/* =========================================================================
+   STORAGE HELPERS
+   ========================================================================= */
+if (!window.storage) {
+  window.storage = {
+    get: async (key, shared) => {
+      const val = localStorage.getItem(key);
+      return val ? { value: val } : null;
+    },
+    set: async (key, value, shared) => {
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+  };
+}
+
+async function safeGet(key, shared){
+  try{ const res = await window.storage.get(key, shared); return res ? res.value : null; }
+  catch(e){ return null; }
+}
+
+async function saveKey(key, value, shared){
+  try{
+    const res = await window.storage.set(key, JSON.stringify(value), shared);
+    if(!res) showToast('Could not save — please try again.');
+    return !!res;
+  }catch(e){ showToast('Could not save — please check your connection.'); return false; }
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  if (toast) {
+    toast.innerText = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+}
+
+async function loadAll(){
+  const s = await safeGet('school', true); DB.school = s ? JSON.parse(s) : null;
+  const st = await safeGet('staff', true); DB.staff = st ? JSON.parse(st) : [];
+  const d = await safeGet('departments', true); DB.departments = d ? JSON.parse(d) : [];
+  const c = await safeGet('classes', true); DB.classes = c ? JSON.parse(c) : [];
+  const sub = await safeGet('subjects', true); DB.subjects = sub ? JSON.parse(sub) : [];
+  const stu = await safeGet('students', true); DB.students = stu ? JSON.parse(stu) : [];
+  const m = await safeGet('marks', true); DB.marks = m ? JSON.parse(m) : [];
+
+  if (!DB.school) {
+    VIEW = { name: 'setup', params: {} };
+  } else if (!SESSION.user) {
+    VIEW = { name: 'login', params: {} };
+  } else {
+    VIEW = { name: 'dashboard', params: {} };
+  }
+  render();
+}
+
+/* =========================================================================
+   RENDER ENGINE
+   ========================================================================= */
+function render() {
+  const app = document.getElementById('app');
+  if (!app) return;
+
+  if (VIEW.name === 'loading') {
+    app.innerHTML = `<div class="auth-wrap"><div class="auth-form-side"><p class="muted">Loading portal...</p></div></div>`;
+    return;
+  }
+
+  if (VIEW.name === 'setup') {
+    app.innerHTML = renderSetupView();
+    return;
+  }
+
+  if (VIEW.name === 'login') {
+    app.innerHTML = renderLoginView();
+    return;
+  }
+
+  app.innerHTML = renderDashboardView();
+}
+
+function renderSetupView() {
+  return `
+    <div class="auth-wrap">
+      <div class="auth-hero">
+        <div class="auth-hero-top">
+          <div class="auth-hero-brand">DARASA PORTAL</div>
+          <div class="auth-hero-title">Setup School Workspace</div>
+          <div class="auth-hero-desc">Initialise your institution's portal to begin assigning roles, managing classes, and logging marks.</div>
+        </div>
+        <div class="auth-hero-foot">Powered by Darasa Engine</div>
+      </div>
+      <div class="auth-form-side">
+        <div class="auth-form-box">
+          <h2>School Setup</h2>
+          <p class="muted small" style="margin-bottom:20px;">Enter institutional details to configure the workspace.</p>
+          <form onsubmit="handleInitialSetup(event)">
+            <div class="field">
+              <label>School Name</label>
+              <input type="text" id="setup_school_name" placeholder="e.g. Alliance High School" required />
+            </div>
+            <div class="field">
+              <label>Headteacher Name</label>
+              <input type="text" id="setup_head_name" placeholder="Full Name" required />
+            </div>
+            <div class="field">
+              <label>Access PIN (4 Digits)</label>
+              <input type="password" id="setup_pin" maxlength="4" class="pin-input" placeholder="0000" required />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Initialise Portal</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderLoginView() {
+  return `
+    <div class="auth-wrap">
+      <div class="auth-hero">
+        <div class="auth-hero-top">
+          <div class="auth-hero-brand">${DB.school ? DB.school.name : 'DARASA PORTAL'}</div>
+          <div class="auth-hero-title">Staff Portal Login</div>
+          <div class="auth-hero-desc">Access administrative tools, duty dockets, and class registers.</div>
+        </div>
+        <div class="auth-hero-foot">TSC Aligned Management System</div>
+      </div>
+      <div class="auth-form-side">
+        <div class="auth-form-box">
+          <h2>Welcome Back</h2>
+          <p class="muted small" style="margin-bottom:20px;">Select your staff account to authenticate.</p>
+          <div class="staff-pick-list">
+            ${DB.staff.map(member => `
+              <button class="staff-pick" onclick="handleLogin('${member.id}')">
+                <div>
+                  <div class="staff-pick-name">${member.name}</div>
+                  <div class="small faint">${ROLE_META[member.role] ? ROLE_META[member.role].label : member.role}</div>
+                </div>
+                <span class="badge badge-${ROLE_META[member.role] ? ROLE_META[member.role].badge : 'subject'}">Select</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderDashboardView() {
+  const user = SESSION.user || { name: 'Staff Member', role: 'subject' };
+  const roleInfo = ROLE_META[user.role] || ROLE_META.subject;
+  const duties = ROLE_DUTIES[user.role] || [];
+
+  return `
+    <div class="shell">
+      <div class="sidebar">
+        <div class="brand">
+          <div class="brand-school">${DB.school ? DB.school.name : 'Darasa'}</div>
+          <div class="brand-tag">Staff Management</div>
+        </div>
+        <button class="nav-item active"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> Dashboard</button>
+        <div class="nav-spacer"></div>
+        <div class="sidebar-user">
+          <div class="sidebar-user-name">${user.name}</div>
+          <div class="small faint" style="margin-bottom:10px;">${roleInfo.label}</div>
+          <button class="btn btn-ghost btn-sm btn-block" onclick="handleLogout()">Sign Out</button>
+        </div>
+      </div>
+      <div class="main">
+        <div class="topbar">
+          <div class="brand-school">${DB.school ? DB.school.name : 'Darasa'}</div>
+          <button class="btn btn-sm btn-ghost" onclick="handleLogout()">Logout</button>
+        </div>
+        <div class="main-inner">
+          <div class="page-head">
+            <h1>Welcome, ${user.name}</h1>
+            <div class="sub">Role: <span class="badge badge-${roleInfo.badge}">${roleInfo.label}</span></div>
+          </div>
+          <div class="col gap-md">
+            <div class="card">
+              <h3>Core Responsibilities & Duties</h3>
+              <p class="muted small" style="margin-bottom:14px;">Grounding based on TSC guidelines for your designated role:</p>
+              <ul class="duty-list">
+                ${duties.map(d => `<li><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg> <span>${d}</span></li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================================
+   ACTIONS & HANDLERS
+   ========================================================================= */
+async function handleInitialSetup(e) {
+  e.preventDefault();
+  const name = document.getElementById('setup_school_name').value.trim();
+  const headName = document.getElementById('setup_head_name').value.trim();
+  const pin = document.getElementById('setup_pin').value.trim();
+
+  if (!name || !headName || pin.length !== 4) {
+    showToast('Please complete all required fields correctly.');
+    return;
+  }
+
+  DB.school = { name, pin };
+  DB.staff = [{ id: 'stf_head', name: headName, role: 'headteacher' }];
+
+  await saveKey('school', DB.school, true);
+  await saveKey('staff', DB.staff, true);
+
+  SESSION.user = DB.staff[0];
+  VIEW = { name: 'dashboard', params: {} };
+  render();
+}
+
+function handleLogin(staffId) {
+  const member = DB.staff.find(s => s.id === staffId);
+  if (member) {
+    SESSION.user = member;
+    VIEW = { name: 'dashboard', params: {} };
+    render();
+  }
+}
+
+function handleLogout() {
+  SESSION.user = null;
+  VIEW = { name: 'login', params: {} };
+  render();
+}
+
+document.addEventListener('DOMContentLoaded', loadAll);
+</script>
+</body>
+</html>
